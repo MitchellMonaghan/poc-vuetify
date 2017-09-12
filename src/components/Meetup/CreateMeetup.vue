@@ -22,6 +22,7 @@
                             </v-text-field>
                         </v-flex>
                     </v-layout>
+                    <!-- End Title -->
 
                     <!-- Location -->
                     <v-layout row>
@@ -36,6 +37,7 @@
                             </v-text-field>
                         </v-flex>
                     </v-layout>
+                    <!-- End Location -->
 
                     <!-- Image Url -->
                     <v-layout row>
@@ -49,6 +51,7 @@
                                 @change="onFilePicked">
                         </v-flex>
                     </v-layout>
+                    <!-- End Image Url -->
 
                     <v-layout row>
                         <v-flex xs12 sm6 offset-sm3>
@@ -70,6 +73,7 @@
                             </v-text-field>
                         </v-flex>
                     </v-layout>
+                    <!-- End Description -->
 
                     <!-- Start and End Dates -->
                     <v-layout row>
