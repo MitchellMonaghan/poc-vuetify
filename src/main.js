@@ -18,7 +18,7 @@ import DateFilter from './filters/date'
 Vue.filter('date', DateFilter)
 
 // Data Stores
-import { store } from './store'
+import store from './store'
 
 Vue.use(Vuetify)
 Vue.use(VueFire)

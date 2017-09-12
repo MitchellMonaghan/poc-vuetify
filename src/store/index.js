@@ -1,152 +1,24 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import firebase from 'firebase'
+
+// Modules
+import app from './modules/app'
+import auth from './modules/auth'
+import meetup from './modules/meetup'
+
+// Plugins
+// import createLogger from '../../../src/plugins/logger'
 
 Vue.use(Vuex)
 
-export const store = new Vuex.Store({
-  state: {
-    loadedMeetups: [
-      {
-        imageUrl: 'http://www.avenuecalgary.com/CalgaryWinter.jpg',
-        id: '1',
-        title: 'Meetup in Calgary',
-        date: new Date(),
-        location: 'Calgary',
-        description: 'COW TOWN MOo'
-      },
-      {
-        imageUrl: 'http://fargocityguide.com/wp-content/uploads/2013/03/fargo-night-life.jpg',
-        id: '2',
-        title: 'Meetup in Fargo',
-        date: new Date(),
-        location: 'Fargo',
-        description: 'Cold winters'
-      }
-    ],
-    user: null,
-    loading: false,
-    error: null
+const debug = process.env.NODE_ENV !== 'production'
+
+export default new Vuex.Store({
+  modules: {
+    app,
+    auth,
+    meetup
   },
-  mutations: {
-    setUser (state, payload) {
-      state.user = payload
-    },
-
-    createMeetup (state, payload) {
-      state.loadedMeetups.push(payload)
-    },
-
-    setLoading (state, payload) {
-      state.loading = payload
-    },
-
-    setError (state, payload) {
-      state.error = payload
-    },
-
-    clearError (state) {
-      state.error = null
-    }
-  },
-  actions: {
-    signUserUp ({commit}, payload) {
-      commit('setLoading', true)
-      commit('clearError')
-
-      firebase.auth().createUserWithEmailAndPassword(payload.email, payload.password).then(
-        user => {
-          commit('setLoading', false)
-
-          const newUser = {
-            id: user.uid,
-            registeredMeetups: []
-          }
-
-          commit('setUser', newUser)
-        }
-      ).catch(
-        error => {
-          commit('setLoading', false)
-          commit('setError', error)
-          console.log(error)
-        }
-      )
-    },
-
-    signUserIn ({commit}, payload) {
-      commit('setLoading', true)
-      commit('clearError')
-
-      firebase.auth().signInWithEmailAndPassword(payload.email, payload.password)
-        .then(
-          user => {
-            commit('setLoading', false)
-
-            const newUser = {
-              id: user.uid,
-              registeredMeetups: []
-            }
-
-            commit('setUser', newUser)
-          }
-      )
-      .catch(
-        error => {
-          commit('setLoading', false)
-          commit('setError', error)
-          console.log(error)
-        }
-      )
-    },
-
-    createMeetup ({commit}, payload) {
-      const meetup = {
-        title: payload.title,
-        location: payload.location,
-        imageUrl: payload.imageUrl,
-        description: payload.description,
-        date: payload.date,
-        id: '3'
-      }
-
-      // Create new meetup call to server
-      commit('createMeetup', meetup)
-    },
-
-    clearError ({commit}) {
-      commit('clearError')
-    }
-  },
-  getters: {
-    user (state) {
-      return state.user
-    },
-
-    loadedMeetups (state) {
-      return state.loadedMeetups.sort((meetupA, meetupB) => {
-        return meetupA.date > meetupB.date
-      })
-    },
-
-    featuredMeetups (state, getters) {
-      return getters.loadedMeetups.slice(0, 5)
-    },
-
-    loadedMeetup (state) {
-      return (meetupId) => {
-        return state.loadedMeetups.find((meetup) => {
-          return meetup.id === meetupId
-        })
-      }
-    },
-
-    loading (state) {
-      return state.loading
-    },
-
-    error (state) {
-      return state.error
-    }
-  }
+  strict: debug,
+  plugins: debug ? [/* createLogger */] : []
 })
