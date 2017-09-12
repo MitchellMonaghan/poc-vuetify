@@ -1,3 +1,4 @@
+import firebase from 'firebase'
 import _ from 'underscore'
 
 const state = {
@@ -40,23 +41,63 @@ const getters = {
 
 // actions
 const actions = {
+  loadMeetups ({commit}) {
+    commit('setLoading', true)
+
+    firebase.database().ref('meetups').once('value')
+      .then((data) => {
+        const meetups = []
+        const obj = data.val()
+
+        for (let key in obj) {
+          meetups.push({
+            id: key,
+            title: obj[key].title,
+            description: obj[key].description,
+            imageUrl: obj[key].imageUrl,
+            location: obj[key].location,
+            date: obj[key].date
+          })
+        }
+
+        commit('setLoadedMeetups', meetups)
+        commit('setLoading', false)
+      })
+      .catch((error) => {
+        console.log(error)
+        commit('setLoading', false)
+      })
+  },
+
   createMeetup ({commit}, payload) {
     const meetup = {
       title: payload.title,
       location: payload.location,
       imageUrl: payload.imageUrl,
       description: payload.description,
-      date: payload.date,
-      id: '3'
+      date: payload.date.toISOString()
     }
 
     // Create new meetup call to server
-    commit('createMeetup', meetup)
+    firebase.database().ref('meetups').push(meetup)
+      .then((data) => {
+        const key = data.key
+        meetup.id = key
+
+        commit('createMeetup', meetup)
+      })
+      .catch((error) => {
+        console.log(error)
+      })
   }
 }
 
 // mutations
 const mutations = {
+  setLoadedMeetups (state, payload) {
+    state.loadedMeetups = payload
+  },
+
   createMeetup (state, payload) {
     state.loadedMeetups.push(payload)
   }

@@ -40,5 +40,7 @@ new Vue({
       storageBucket: 'poc-vuetify.appspot.com',
       messagingSenderId: '194500800551'
     })
+
+    this.$store.dispatch('loadMeetups')
   }
 })
