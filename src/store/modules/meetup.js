@@ -74,17 +74,35 @@ const actions = {
     const meetup = {
       title: payload.title,
       location: payload.location,
-      imageUrl: payload.imageUrl,
       description: payload.description,
       date: payload.date.toISOString(),
       creatorId: getters.user.id
     }
 
+    let imageUrl
+    let key
+
     // Create new meetup call to server
+    // Save meetup to DB
     firebase.database().ref('meetups').push(meetup)
       .then((data) => {
-        const key = data.key
+        key = data.key
+
+        const filename = payload.image.name
+        const ext = filename.slice(filename.lastIndexOf('.'))
+
+        // Save image to Firebase file storage
+        return firebase.storage().ref(`meetups/${key}.${ext}`).put(payload.image)
+      })
+      .then(fileData => {
+        // Get url to stored image on firebase, and update orginal meetup record with the image url
+        imageUrl = fileData.metadata.downloadURLs[0]
+        return firebase.database().ref('meetups').child(key).update({imageUrl: imageUrl})
+      })
+      .then(() => {
+        // Update local storage
         meetup.id = key
+        meetup.imageUrl = imageUrl
 
         commit('createMeetup', meetup)
       })

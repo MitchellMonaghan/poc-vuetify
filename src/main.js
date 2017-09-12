@@ -37,7 +37,7 @@ new Vue({
       authDomain: 'poc-vuetify.firebaseapp.com',
       databaseURL: 'https://poc-vuetify.firebaseio.com',
       projectId: 'poc-vuetify',
-      storageBucket: 'poc-vuetify.appspot.com',
+      storageBucket: 'gs://poc-vuetify.appspot.com',
       messagingSenderId: '194500800551'
     })
 
