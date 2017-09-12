@@ -56,7 +56,8 @@ const actions = {
             description: obj[key].description,
             imageUrl: obj[key].imageUrl,
             location: obj[key].location,
-            date: obj[key].date
+            date: obj[key].date,
+            creatorId: obj[key].creatorId
           })
         }
 
@@ -69,13 +70,14 @@ const actions = {
       })
   },
 
-  createMeetup ({commit}, payload) {
+  createMeetup ({commit, getters}, payload) {
     const meetup = {
       title: payload.title,
       location: payload.location,
       imageUrl: payload.imageUrl,
       description: payload.description,
-      date: payload.date.toISOString()
+      date: payload.date.toISOString(),
+      creatorId: getters.user.id
     }
 
     // Create new meetup call to server
