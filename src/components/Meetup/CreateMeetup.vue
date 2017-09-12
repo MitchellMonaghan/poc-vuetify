@@ -169,7 +169,8 @@ export default {
         location: this.location,
         image: this.image,
         description: this.description,
-        date: this.submittableDateTime
+        date: this.submittableDateTime,
+        user: this.$store.getters.user
       }
 
       this.$store.dispatch('createMeetup', meetupData)

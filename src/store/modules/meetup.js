@@ -2,24 +2,7 @@ import firebase from 'firebase'
 import _ from 'underscore'
 
 const state = {
-  loadedMeetups: [
-    {
-      imageUrl: 'http://www.avenuecalgary.com/CalgaryWinter.jpg',
-      id: '1',
-      title: 'Meetup in Calgary',
-      date: new Date(),
-      location: 'Calgary',
-      description: 'COW TOWN MOo'
-    },
-    {
-      imageUrl: 'http://fargocityguide.com/wp-content/uploads/2013/03/fargo-night-life.jpg',
-      id: '2',
-      title: 'Meetup in Fargo',
-      date: new Date(),
-      location: 'Fargo',
-      description: 'Cold winters'
-    }
-  ]
+  loadedMeetups: []
 }
 
 // getters
@@ -34,7 +17,8 @@ const getters = {
 
   loadedMeetup (state) {
     return (meetupId) => {
-      return _.findWhere(state.loadedMeetups, { id: meetupId })
+      const loadedMeetup = _.findWhere(state.loadedMeetups, { id: meetupId })
+      return loadedMeetup === undefined ? {} : loadedMeetup
     }
   }
 }
@@ -76,7 +60,7 @@ const actions = {
       location: payload.location,
       description: payload.description,
       date: payload.date.toISOString(),
-      creatorId: getters.user.id
+      creatorId: payload.user.id
     }
 
     let imageUrl
@@ -137,6 +121,45 @@ const actions = {
         console.log(error)
         commit('setLoading', false)
       })
+  },
+
+  registerUserForMeetup ({commit, getters}, payload) {
+    commit('setLoading', true)
+
+    const user = payload.user
+
+    firebase.database().ref(`/users/${user.id}`).child('/registrations').push(payload.meetupId)
+      .then(data => {
+        commit('setLoading', false)
+        commit('registerUserForMeetup', {meetupId: payload.meetupId, fbKey: data.key, user: user})
+      })
+      .catch(error => {
+        commit('setLoading', false)
+        console.log(error)
+      })
+  },
+
+  unregisterUserFromMeetup ({commit}, payload) {
+    commit('setLoading', true)
+
+    const user = payload.user
+
+    if (!user.fbKeys) {
+      return
+    }
+
+    const fbKey = user.fbKeys[payload.meetupId]
+
+    firebase.database().ref(`/users/${user.id}/registrations/`).child(fbKey)
+      .remove()
+      .then(() => {
+        commit('setLoading', false)
+        commit('unregisterUserFromMeetup', {meetupId: payload.meetupId, user: user})
+      })
+      .catch(error => {
+        commit('setLoading', false)
+        console.log(error)
+      })
   }
 }
 
@@ -164,6 +187,20 @@ const mutations = {
     if (payload.date) {
       meetup.date = payload.date
     }
+  },
+
+  registerUserForMeetup (state, payload) {
+    const meetupId = payload.meetupId
+
+    payload.user.registeredMeetups.push(meetupId)
+    payload.user.fbKeys[meetupId] = payload.fbKey
+  },
+
+  unregisterUserFromMeetup (state, payload) {
+    const registeredMeetups = payload.user.registeredMeetups
+    registeredMeetups.splice(_.findWhere(registeredMeetups, payload.meetupId))
+
+    Reflect.deleteProperty(payload.user.fbKeys, payload.meetupId)
   }
 }
 
