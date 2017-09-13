@@ -1,0 +1,52 @@
+// Firebase configuration saving this file for documentation/code history
+//These configuration settings should match the settings actually on firebase, please keep them in sync
+//Pasting these rules into firebase will remove the comments, no need to manually remove them
+
+//Templates to reduce typing, can use for copy pasta
+// ".read": "auth != null",
+// ".write": "auth != null"
+
+{
+    "rules": {
+        //Meetup access, everyone can read a meetup
+        //Anyone can create a meetup
+        //You can only write to a meetup if you are the creator
+        
+        //Validation rules
+        //Required fields: creatorId, date, description, imageUrl, location, title
+        //TODO: Figure out how to require image
+        //TODO: Figure out how to properly setup/test api end point security as you set these up as this looks as it is easy to make a
+        //mistake and have a security hole
+        "meetups": {
+            ".read": true,
+            ".write": "auth != null",
+
+            "$meetup_id": {
+                ".validate": "newData.hasChildren(['creatorId', 'title', 'date','location', 'description'])",
+                "creatorId": {
+                    ".validate": "(newData.val() === auth.uid && !data.exists()) ||(data.val() === auth.uid && data.exists())"
+                },
+                "title": { ".validate": "newData.isString()"},
+                "date": { ".validate": "newData.isString() && newData.val().matches(/(\\d{4})-(\\d{2})-(\\d{2})T((\\d{2}):(\\d{2}):(\\d{2})\\.(\\d{3}))Z/)"},
+                "location": { ".validate": "newData.isString()"},
+                "description": { ".validate": "newData.isString()"},
+                "imageUrl": { ".validate": "newData.isString()"},
+                "$other": { ".validate": false }
+            }
+        },
+
+        //Everyone can view your profile/meetups you signed up for
+        //Only you can write to your own profile/register for meetups
+        "users": {
+            ".read": true,
+            
+            "$user_id": {
+                ".write": "auth.uid === $user_id",
+                "registrations": { 
+                    "$registration_id": {".validate": "root.child('meetups').hasChild(newData.val()) && newData.isString()" }
+                },
+                "$other": { ".validate": false }
+            }
+        }
+    }
+}

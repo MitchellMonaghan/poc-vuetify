@@ -36,12 +36,12 @@ const actions = {
         for (let key in obj) {
           meetups.push({
             id: key,
+            creatorId: obj[key].creatorId,
             title: obj[key].title,
-            description: obj[key].description,
-            imageUrl: obj[key].imageUrl,
-            location: obj[key].location,
             date: obj[key].date,
-            creatorId: obj[key].creatorId
+            location: obj[key].location,
+            description: obj[key].description,
+            imageUrl: obj[key].imageUrl
           })
         }
 
@@ -56,11 +56,12 @@ const actions = {
 
   createMeetup ({commit, getters}, payload) {
     const meetup = {
+      creatorId: payload.user.id,
       title: payload.title,
+      date: payload.date.toISOString(),
       location: payload.location,
       description: payload.description,
-      date: payload.date.toISOString(),
-      creatorId: payload.user.id
+      imageUrl: ''
     }
 
     let imageUrl

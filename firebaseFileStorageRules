@@ -1,0 +1,36 @@
+// Firebase configuration saving this file for documentation/code history
+//These configuration settings should match the settings actually on firebase, please keep them in sync
+
+function isAuthenticated()
+{
+    return request.auth != null
+}
+
+function isCurrentUser(uid)
+{
+    return request.auth.uid == uid;
+}
+
+function lessThanNMegabytes(n) {
+    return request.resource.size < n * 1024 *1024;
+}
+
+function isImage() {
+    return request.resource.contentType.matches("image/.*")
+}
+
+function canNotDelete() {
+    return request.resource != null
+}
+
+service firebase.storage {
+    match /b/{bucket}/o {
+      match /{allPaths=**} {
+        allow read;
+        allow write: if isAuthenticated() && 
+                        lessThanNMegabytes(5) &&
+                        isImage() &&
+                        canNotDelete();
+      }
+    }
+}
