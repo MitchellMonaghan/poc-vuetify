@@ -40,7 +40,7 @@
                         <div>{{ meetup.description }}</div>
                     </v-card-text>
 
-                    <v-card-actions v-if="!userIsCreator">
+                    <v-card-actions v-if="!userIsCreator && userIsAuthenticated">
                         <v-spacer></v-spacer>
                         <v-btn class="primary" v-if="!userIsRegistered" @click="onRegister">Register</v-btn>
                         <v-btn class="primary" v-if="userIsRegistered" @click="onUnregister">Unregister</v-btn>
