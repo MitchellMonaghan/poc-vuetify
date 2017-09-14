@@ -27,9 +27,9 @@
         <!-- End Carousel Loader -->
 
         <!-- Carousel -->
-        <v-layout row wrap class="mt-2" v-if="!loading">
+        <v-layout row wrap class="mt-2">
             <v-flex xs12>
-                <v-carousel style="cursor:pointer">
+                <v-carousel style="cursor:pointer" v-if="!loading && !reloadingCarousel">
                     <v-carousel-item 
                     v-for="meetup in meetups"
                     :src="meetup.imageUrl"
@@ -55,6 +55,12 @@
 
 <script>
     export default {
+      data () {
+        return {
+          reloadingCarousel: false
+        }
+      },
+
       computed: {
         meetups () {
           return this.$store.getters.featuredMeetups
@@ -62,6 +68,16 @@
 
         loading () {
           return this.$store.getters.loading
+        }
+      },
+
+      watch: {
+        // whenever meetups changes, this function will run
+        // Carousel needs a reset when source array changes data
+        meetups: function () {
+          this.reloadingCarousel = true
+
+          this.$nextTick(() => { this.reloadingCarousel = false })
         }
       },
 
