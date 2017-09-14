@@ -14,7 +14,6 @@
         
         //Validation rules
         //Required fields: creatorId, date, description, imageUrl, location, title
-        //TODO: Figure out how to require image
         //TODO: Figure out how to properly setup/test api end point security as you set these up as this looks as it is easy to make a
         //mistake and have a security hole
         "meetups": {
