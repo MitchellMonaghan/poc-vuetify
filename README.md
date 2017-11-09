@@ -1,6 +1,7 @@
 # poc-vuetify
 
-> A Vue.js project
+> A Vue.js project.
+The tutorial for building this project can be found here https://www.youtube.com/watch?v=FXY1UyQfSFw&list=PL55RiY5tL51qxUbODJG9cgrsVd7ZHbPrt
 
 ## Build Setup
 
